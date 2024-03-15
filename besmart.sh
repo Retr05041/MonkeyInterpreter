@@ -9,9 +9,9 @@ if [ ! -d /usr/local/go  ]; then
   read -p "Automatically install latest version? [y/n]: " response
   if [[ "$response" =~ ^([yY][eE][sS]|[yY])+$ ]]
   then
-    wget https://go.dev/dl/go1.21.6.linux-amd64.tar.gz
-    sudo tar -C /usr/local -xzf go1.21.6.linux-amd64.tar.gz
-    rm -rf go1.21.6.linux-amd64.tar.gz
+    wget https://go.dev/dl/go1.22.1.linux-amd64.tar.gz
+    sudo tar -C /usr/local -xzf go1.22.1.linux-amd64.tar.gz
+    rm -rf go1.22.1.linux-amd64.tar.gz
     export PATH=$PATH:/usr/local/go/bin
     dependancyFailure=false
     echo "Go successfully installed! - Path has been altered temporarily, please add \"/usr/local/go/bin\" to ~/.profile"
