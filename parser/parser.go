@@ -7,17 +7,7 @@ import (
 	"fmt"
 )
 
-type Parser struct {
-	l *lexer.Lexer // Instance of the lexer
-
-	// like position and readPosition but for tokens instead of characters
-	curToken  token.Token
-	peekToken token.Token
-
-	// Error handleing
-	errors []string
-}
-
+// === NEW PARSER ===
 func New(l *lexer.Lexer) *Parser {
 	p := &Parser{
 		l:      l,
@@ -31,17 +21,20 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
-// Returns errors of current program
-func (p *Parser) Errors() []string {
-	return p.errors
+// === PARSER ===
+type Parser struct {
+	l *lexer.Lexer // Instance of the lexer
+
+	// like position and readPosition but for tokens instead of characters
+	curToken  token.Token
+	peekToken token.Token
+
+	// Error handleing
+	errors []string
 }
 
-func (p *Parser) peekError(t token.TokenType) {
-	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peekToken.Type)
-	p.errors = append(p.errors, msg)
-}
-
-// So far empty
+// == Program Parsing
+// While we are not at the end of the file, Parse away
 func (p *Parser) ParseProgram() *ast.Program {
 	program := &ast.Program{}
 	program.Statements = []ast.Statement{}
@@ -57,6 +50,7 @@ func (p *Parser) ParseProgram() *ast.Program {
 	return program
 }
 
+// based off what token we are at in the statement, parse accordingly
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.LET:
@@ -66,12 +60,47 @@ func (p *Parser) parseStatement() ast.Statement {
 	}
 }
 
+// == Error handling ==
+// Returns errors of current program
+func (p *Parser) Errors() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.peekToken.Type)
+	p.errors = append(p.errors, msg)
+}
+
+// == Helper functions ==
+// Checks if the current token is t
+func (p *Parser) curTokenIs(t token.TokenType) bool {
+	return p.curToken.Type == t
+}
+
+// Checks if next token is t
+func (p *Parser) peekTokenIs(t token.TokenType) bool {
+	return p.peekToken.Type == t
+}
+
+// == Sliding Functions ==
+// Checks if the next token is t then moves to it if its true - enforces correctness of structure
+func (p *Parser) expectPeek(t token.TokenType) bool {
+	if p.peekTokenIs(t) {
+		p.nextToken()
+		return true
+	} else {
+		p.peekError(t)
+		return false
+	}
+}
+
 // Slide down the tokens from the lexer
 func (p *Parser) nextToken() {
 	p.curToken = p.peekToken
 	p.peekToken = p.l.NextToken()
 }
 
+// == SPECFIC STATEMENT PARSING ==
 // Constructs a *ast.LetStatement node with the token its currently on
 func (p *Parser) parseLetStatement() *ast.LetStatement {
 	stmt := &ast.LetStatement{Token: p.curToken}
@@ -95,25 +124,4 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	}
 
 	return stmt
-}
-
-// Checks if the current token is t
-func (p *Parser) curTokenIs(t token.TokenType) bool {
-	return p.curToken.Type == t
-}
-
-// Checks if next token is t
-func (p *Parser) peekTokenIs(t token.TokenType) bool {
-	return p.peekToken.Type == t
-}
-
-// Checks if the next token is t then moves to it if its true - enforces correctness of structure
-func (p *Parser) expectPeek(t token.TokenType) bool {
-	if p.peekTokenIs(t) {
-		p.nextToken()
-		return true
-	} else {
-		p.peekError(t)
-		return false
-	}
 }
