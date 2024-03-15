@@ -10,6 +10,7 @@ import "MonkeyInterpreter/token"
 // Every node in our AST needs to implement a Node
 // Has to provide a TokenLiteral that returns the literal value of the token its associated with
 // TokenLiteral is only for debugging
+// === NODE TYPES ===
 type Node interface {
 	TokenLiteral() string
 }
@@ -24,6 +25,7 @@ type Expression interface {
 	expressionNode()
 }
 
+// === IDENTIFIER + STATEMENT NODES ===
 // struct for the given identifier
 type Identifier struct {
 	Token token.Token // the token.IDENT token
@@ -41,10 +43,18 @@ type LetStatement struct {
 	Value Expression  // The expression following the '='
 }
 
-// Satisfies the Expression and Node interfaces
 func (i *LetStatement) statementNode()       {}
 func (i *LetStatement) TokenLiteral() string { return i.Token.Literal }
 
+type ReturnStatement struct {
+	Token       token.Token // the 'return' token
+	ReturnValue Expression
+}
+
+func (rs *ReturnStatement) statementNode()       {}
+func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
+
+// === PROGRAM STRUCT ===
 // Root Node for every AST
 // Every valid Monkey program is just a series of statments
 type Program struct {
