@@ -50,7 +50,6 @@ type LetStatement struct {
 
 func (i *LetStatement) statementNode()       {}
 func (i *LetStatement) TokenLiteral() string { return i.Token.Literal }
-
 func (ls *LetStatement) String() string {
 	var out bytes.Buffer
 
@@ -74,7 +73,6 @@ type ReturnStatement struct {
 
 func (rs *ReturnStatement) statementNode()       {}
 func (rs *ReturnStatement) TokenLiteral() string { return rs.Token.Literal }
-
 func (rs *ReturnStatement) String() string {
 	var out bytes.Buffer
 
@@ -96,7 +94,6 @@ type ExpressionStatement struct {
 
 func (es *ExpressionStatement) statementNode()       {}
 func (es *ExpressionStatement) TokenLiteral() string { return es.Token.Literal }
-
 func (es *ExpressionStatement) String() string {
 	if es.Expression != nil {
 		return es.Expression.String()
